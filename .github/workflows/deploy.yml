@@ -97,21 +97,100 @@ jobs:
     environment: production
 
     steps:
-      - name: Trigger the Render deploy
-        # A deploy hook rather than Render's own GitHub auto-deploy, purely so it happens
-        # after migrations rather than racing them. Render's Auto-Deploy is set to Off for
-        # the same reason.
+      - name: Deploy to Render and wait for it to go live
+        # A deploy hook rather than Render's own GitHub auto-deploy, so this happens after
+        # migrations rather than racing them. Render's Auto-Deploy is Off for the same reason.
+        #
+        # The hook alone is fire-and-forget: it returns the moment Render ACCEPTS the request,
+        # which would make this job green while the build fails, the image crashes on boot, or
+        # the instance never passes its health check. So the job polls until the deploy reaches
+        # a terminal state.
+        #
+        # Reaching `live` is a real assertion, not just "the build compiled": Render only marks
+        # a deploy live once its health check path — /health/ready — returns success, and that
+        # check includes the pending-migrations check.
         env:
           DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
-          if [ -z "$DEPLOY_HOOK_URL" ]; then
+          set -euo pipefail
+
+          if [ -z "${DEPLOY_HOOK_URL:-}" ]; then
             echo "::error::RENDER_DEPLOY_HOOK_URL is not set on the production environment."
             exit 1
           fi
 
-          curl --fail --silent --show-error --request POST "$DEPLOY_HOOK_URL"
+          if [ -z "${RENDER_API_KEY:-}" ]; then
+            echo "::error::RENDER_API_KEY is not set on the production environment. Create one at Render → Account Settings → API Keys. Without it this job can only fire the hook and never learn whether the deploy actually succeeded."
+            exit 1
+          fi
 
-      - name: Note
-        run: |
-          echo "Render is now building. The instance stays out of the load balancer until"
-          echo "/health/ready passes, which includes the schema check."
+          # The service id is already inside the hook URL: .../deploy/srv-XXXX?key=YYYY
+          SERVICE_ID=$(printf '%s' "$DEPLOY_HOOK_URL" | grep -oE 'srv-[a-zA-Z0-9]+' | head -1 || true)
+          if [ -z "$SERVICE_ID" ]; then
+            echo "::error::Could not read a service id (srv-...) out of RENDER_DEPLOY_HOOK_URL."
+            exit 1
+          fi
+
+          render_api() {
+            curl --fail --silent --show-error -H "Authorization: Bearer $RENDER_API_KEY" "$@"
+          }
+
+          latest_deploy_id() {
+            render_api "https://api.render.com/v1/services/$SERVICE_ID/deploys?limit=1"               | jq -r '.[0].deploy.id // .[0].id // empty'
+          }
+
+          # Record the newest deploy BEFORE triggering. Without this the poll below can read
+          # the PREVIOUS deploy — still `live` from the last release — and call the new one a
+          # success before Render has even created it.
+          PREVIOUS_DEPLOY_ID=$(latest_deploy_id || true)
+          echo "Previous deploy: ${PREVIOUS_DEPLOY_ID:-none}"
+
+          curl --fail --silent --show-error --request POST "$DEPLOY_HOOK_URL" > /dev/null
+          echo "Deploy hook accepted; waiting for Render to create the deploy."
+
+          DEPLOY_ID=""
+          for _ in $(seq 1 30); do
+            CANDIDATE=$(latest_deploy_id || true)
+            if [ -n "$CANDIDATE" ] && [ "$CANDIDATE" != "$PREVIOUS_DEPLOY_ID" ]; then
+              DEPLOY_ID="$CANDIDATE"
+              break
+            fi
+            sleep 5
+          done
+
+          if [ -z "$DEPLOY_ID" ]; then
+            echo "::error::Render accepted the hook but never created a new deploy."
+            exit 1
+          fi
+
+          echo "Watching deploy $DEPLOY_ID"
+          DEPLOY_URL="https://dashboard.render.com/web/$SERVICE_ID/deploys/$DEPLOY_ID"
+
+          # 40 minutes at 15s. A Render build slower than that has gone wrong in a way worth
+          # failing loudly rather than waiting out.
+          for _ in $(seq 1 160); do
+            STATUS=$(render_api "https://api.render.com/v1/services/$SERVICE_ID/deploys/$DEPLOY_ID"               | jq -r '.status // .deploy.status // empty' || true)
+
+            case "$STATUS" in
+              live)
+                echo "Deploy is live — Render's health check on /health/ready passed."
+                exit 0
+                ;;
+              build_failed|update_failed|pre_deploy_failed|canceled|deactivated)
+                echo "::error::Render deploy finished as '$STATUS'. Logs: $DEPLOY_URL"
+                exit 1
+                ;;
+              "")
+                echo "  (no status yet, retrying)"
+                ;;
+              *)
+                echo "  $STATUS"
+                ;;
+            esac
+
+            sleep 15
+          done
+
+          echo "::error::Timed out after 40 minutes waiting on deploy $DEPLOY_ID. Logs: $DEPLOY_URL"
+          exit 1

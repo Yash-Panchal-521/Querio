@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Querio">
+  <!--
+    The QuerioMark geometry (src/components/brand/querio-mark.tsx) on a 24 grid, scaled to
+    fill a 64 tile. Stroke weights are heavier than a pure scale of the component: at favicon
+    sizes a faithful 1.5 unit line renders sub-pixel and disappears.
+  -->
+  <rect width="64" height="64" rx="14" fill="#404aaf" />
+  <g fill="none" stroke="#fcfbf8" stroke-linecap="round">
+    <circle cx="28.75" cy="28.75" r="16.25" stroke-width="4.6" />
+    <path d="M22.25 23.3h13M22.25 29.8h13M22.25 36.3h7.6" stroke-width="3.2" />
+    <path d="m41.1 41.1 9.3 9.3" stroke-width="5.2" />
+  </g>
+</svg>
