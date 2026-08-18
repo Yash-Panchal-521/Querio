@@ -1,0 +1,274 @@
+@import "tailwindcss";
+
+/* ---------------------------------------------------------------------------
+ * Querio design tokens
+ *
+ * Names follow shadcn/ui exactly so components can be dropped in later without
+ * a migration. Values do not — shadcn's neutral slate is tuned for dashboards,
+ * and Querio is a reading surface: long grounded answers, quoted source
+ * passages, document tables. The palette is built around that.
+ *
+ * "Warm paper, cool ink": surfaces carry a faint yellow bias (hue 85) so a
+ * full-page wall of text does not glare like pure #fff, and text carries a
+ * faint violet-blue bias (hue 274) so it reads as ink rather than soot. Dark
+ * mode inverts the relationship — the ink becomes the field, the paper becomes
+ * the marks — which keeps one identity across both themes instead of two.
+ *
+ * Hues are spaced so the five semantic roles never get confused at chip size:
+ *   danger 25 · warning 62 · success 150 · citation 200 · primary 274
+ *
+ * Colours are oklch because perceptual lightness is what makes the two themes
+ * tunable against a contrast target. Tailwind v4 already requires the browsers
+ * that support it (Safari 16.4+ / Chrome 111+ / Firefox 128+), so this adds no
+ * new floor. Every value was checked to sit inside the sRGB gamut — an
+ * out-of-gamut oklch gets browser-dependent gamut mapping, which silently
+ * moves the colour out from under its measured contrast ratio.
+ *
+ * WCAG 2.1 contrast, computed rather than eyeballed. AA needs 4.5:1 for body
+ * text, 3:1 for large text and for the non-text affordances in SC 1.4.11.
+ *
+ *                                          light      dark
+ *   foreground / background               16.74:1   15.44:1   (AAA both)
+ *   foreground / card                     17.33:1   14.26:1
+ *   foreground / popover                  17.33:1   13.58:1
+ *   foreground / muted                    15.66:1   13.03:1
+ *   foreground / citation-subtle          15.13:1   10.90:1
+ *   muted-foreground / background          6.46:1    7.51:1
+ *   muted-foreground / card                6.69:1    6.94:1
+ *   muted-foreground / muted               6.04:1    6.34:1
+ *   secondary-foreground / secondary      11.94:1   11.72:1
+ *   accent-foreground / accent            11.62:1   10.79:1
+ *   primary-foreground / primary           7.16:1    7.87:1
+ *   destructive-foreground / destructive   6.07:1    6.47:1
+ *   success-foreground / success           6.22:1    8.39:1
+ *   warning-foreground / warning           5.93:1    9.04:1
+ *   citation-foreground / citation         6.32:1    8.93:1
+ *   primary / background   (link text)     7.22:1    8.07:1
+ *   primary / card                         7.48:1    7.45:1
+ *   citation / background                  6.36:1    9.23:1
+ *   citation / card                        6.59:1    8.52:1
+ *   destructive / background               6.13:1    6.59:1
+ *   success / background                   6.26:1    8.69:1
+ *   warning / background                   5.99:1    9.25:1
+ *   ring / background      (min 3:1)       4.86:1    6.45:1
+ *   ring / card            (min 3:1)       5.03:1    5.96:1
+ *   input / background     (min 3:1)       3.06:1    3.37:1
+ *   input / card           (min 3:1)       3.17:1    3.11:1
+ *   border / background    (decorative)    1.41:1    1.47:1
+ *
+ * Body text clears AAA (7:1) in both themes, not just AA — the product asks
+ * people to read multi-paragraph answers, so the extra headroom is the point.
+ * ------------------------------------------------------------------------- */
+
+/* next-themes writes `class="dark"` on <html>; without this Tailwind's `dark:`
+   variant would keep listening to prefers-color-scheme and ignore the toggle. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* `.light` shares the root declarations so any subtree can be pinned to a
+   theme regardless of the active one — what /design needs to show both at
+   once, and what a permanently-light surface (a print view, an embedded
+   document preview) would need later. */
+:root,
+.light {
+  --background: oklch(98.8% 0.004 85);
+  --foreground: oklch(22% 0.014 274);
+
+  /* Cards sit *above* the page here: the page is warm paper, cards are pure
+     white. Elevation reads without needing a shadow on every container. */
+  --card: oklch(100% 0 0);
+  --card-foreground: oklch(22% 0.014 274);
+  --popover: oklch(100% 0 0);
+  --popover-foreground: oklch(22% 0.014 274);
+
+  --primary: oklch(46% 0.16 274);
+  --primary-foreground: oklch(98.5% 0.004 274);
+  --secondary: oklch(95.4% 0.007 85);
+  --secondary-foreground: oklch(30% 0.014 274);
+  --muted: oklch(96.5% 0.005 85);
+  --muted-foreground: oklch(47.5% 0.013 274);
+
+  /* shadcn's `accent` is the hover/active surface, not the brand colour — the
+     brand lives in `primary`. Tinting it toward the primary hue makes hover
+     states feel connected to the accent instead of a generic grey wash. */
+  --accent: oklch(94.5% 0.012 274);
+  --accent-foreground: oklch(30% 0.02 274);
+
+  --destructive: oklch(51% 0.19 25);
+  --destructive-foreground: oklch(98.5% 0.005 25);
+  --success: oklch(47% 0.11 150);
+  --success-foreground: oklch(98.5% 0.005 150);
+  --warning: oklch(50% 0.11 62);
+  --warning-foreground: oklch(98.5% 0.005 62);
+
+  /* Citations get their own hue rather than borrowing `primary`. A chip is
+     rendered mid-sentence next to ordinary links, so "this jumps to a source
+     chunk" has to be distinguishable from "this is a link" at a glance.
+     `citation-subtle` is the wash laid behind a quoted passage; body
+     `foreground` on it still clears AAA, so highlighted text stays readable. */
+  --citation: oklch(47% 0.075 200);
+  --citation-foreground: oklch(98.5% 0.005 200);
+  --citation-subtle: oklch(95% 0.03 200);
+
+  --border: oklch(87.5% 0.007 85);
+
+  /* Deliberately much darker than `border`, and than shadcn's default, which
+     ships them equal. A field's outline is the only thing telling you it is a
+     field, so SC 1.4.11 puts it at 3:1 — dividers carry no such duty. */
+  --input: oklch(65.5% 0.008 85);
+  --ring: oklch(55% 0.15 274);
+
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: oklch(17.5% 0.009 274);
+  --foreground: oklch(93% 0.006 85);
+
+  --card: oklch(21.5% 0.011 274);
+  --card-foreground: oklch(93% 0.006 85);
+  --popover: oklch(23.5% 0.012 274);
+  --popover-foreground: oklch(93% 0.006 85);
+
+  /* Dark surfaces need a light primary, so the fill/label roles swap: the
+     lavender is the fill and the ink is the label. */
+  --primary: oklch(74% 0.125 274);
+  --primary-foreground: oklch(19% 0.03 274);
+  --secondary: oklch(26.5% 0.012 274);
+  --secondary-foreground: oklch(91% 0.006 85);
+  --muted: oklch(25% 0.011 274);
+  --muted-foreground: oklch(71.5% 0.014 85);
+
+  --accent: oklch(30% 0.03 274);
+  --accent-foreground: oklch(92% 0.015 274);
+
+  --destructive: oklch(70% 0.17 25);
+  --destructive-foreground: oklch(19% 0.04 25);
+  --success: oklch(74% 0.14 150);
+  --success-foreground: oklch(19% 0.04 150);
+  --warning: oklch(78% 0.14 70);
+  --warning-foreground: oklch(19% 0.035 70);
+
+  --citation: oklch(76% 0.11 200);
+  --citation-foreground: oklch(19% 0.028 200);
+  --citation-subtle: oklch(30% 0.045 200);
+
+  --border: oklch(31.5% 0.012 274);
+  --input: oklch(51.5% 0.013 274);
+  --ring: oklch(68% 0.125 274);
+}
+
+/* `inline` keeps the generated utilities pointing at var(--token) instead of
+   baking today's value in. Without it, `.dark` would reassign the variables and
+   nothing on screen would change. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-citation: var(--citation);
+  --color-citation-foreground: var(--citation-foreground);
+  --color-citation-subtle: var(--citation-subtle);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Tailwind's stock line-heights are tuned for UI chrome. Body copy here is
+     answer text and quoted source passages, so `base` gets a taller measure,
+     and headings get a tighter one to stop them drifting apart from their
+     own descenders. */
+  --text-base--line-height: 1.65;
+  --text-lg--line-height: 1.6;
+  --text-2xl--line-height: 1.3;
+  --text-3xl--line-height: 1.2;
+  --text-4xl--line-height: 1.15;
+
+  /* Reading size for streamed answers and source excerpts. Slightly above
+     16px, because these columns are read continuously rather than scanned. */
+  --text-reading: 1.0625rem;
+  --text-reading--line-height: 1.75;
+
+  /* Measure cap for prose columns. Beyond roughly 75 characters the eye loses
+     the line it is returning to. */
+  --container-reading: 68ch;
+
+  /* Overrides Tailwind's defaults so `rounded-md` etc. track `--radius`, which
+     is the contract shadcn components rely on. */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@layer base {
+  /* Default every border to the token. Tailwind v4 dropped the v3 preflight
+     rule that did this, so `border` alone would otherwise paint currentColor —
+     i.e. body text colour — around the element. */
+  *,
+  ::after,
+  ::before {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    /* Kerning and default ligatures matter more than usual at this text volume. */
+    text-rendering: optimizeLegibility;
+  }
+
+  /* The theme flips a class on <html>, so honour a user who has asked the OS to
+     reduce motion rather than cross-fading the whole page under them. */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::after,
+    ::before {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Toast entrance. Written by hand rather than pulling in an animation plugin for one
+   effect — and gated on prefers-reduced-motion, since a toast sliding in is decoration. */
+@keyframes toast-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.toast-enter {
+  animation: toast-enter 160ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-enter {
+    animation: none;
+  }
+}

@@ -1,0 +1,5 @@
+# EF Core writes these files. Holding generated code to hand-written style rules means
+# every `dotnet ef migrations add` can break the build for reasons nobody can act on.
+[*.cs]
+generated_code = true
+dotnet_analyzer_diagnostic.severity = none

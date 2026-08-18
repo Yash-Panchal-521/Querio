@@ -1,0 +1,11 @@
+# Install scripts are denied unless something actually needs them. Every entry here is a
+# package pnpm offered to let run arbitrary code at install time.
+#
+# We use Firebase Auth only. @firebase/util's script and protobufjs's code generation both
+# serve parts of the SDK we do not touch — Firestore and the gRPC transports — so neither
+# earns the right to execute during install.
+allowBuilds:
+  "@firebase/util": false
+  protobufjs: false
+  sharp: false
+  unrs-resolver: false

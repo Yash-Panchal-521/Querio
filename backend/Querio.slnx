@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Querio.Api/Querio.Api.csproj" />
+    <Project Path="src/Querio.Application/Querio.Application.csproj" />
+    <Project Path="src/Querio.Domain/Querio.Domain.csproj" />
+    <Project Path="src/Querio.Infrastructure/Querio.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Querio.Api.Tests/Querio.Api.Tests.csproj" />
+    <Project Path="tests/Querio.Application.Tests/Querio.Application.Tests.csproj" />
+  </Folder>
+</Solution>

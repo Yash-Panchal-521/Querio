@@ -1,0 +1,13 @@
+.next/
+.next-verify/
+out/
+build/
+node_modules/
+pnpm-lock.yaml
+next-env.d.ts
+
+# Next.js rewrites tsconfig.json itself to manage `include`, in its own style rather than
+# Prettier's — and it rewrites again every time NEXT_DIST_DIR changes which types directory
+# is in play. Asserting a formatter over a machine-managed file just guarantees a recurring
+# format:check failure that says nothing about the code.
+tsconfig.json

@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [main, dev]
+
+# A newer push makes an in-flight check obsolete, so stop paying for it.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        # The SDK finds global.json by walking up from the working directory, and ours sits
+        # in backend/. Run from the repository root and its `test.runner` setting is simply
+        # invisible, so `dotnet test` silently falls back to VSTest — which then rejects
+        # --solution with `MSBUILD : error MSB1001: Unknown switch`.
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Reads the version from backend/global.json, so CI and a developer's machine can
+      # never drift onto different SDKs. Action inputs are resolved against the workspace
+      # root and are unaffected by the working-directory above.
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: backend/global.json
+
+      - name: Restore
+        run: dotnet restore Querio.slnx
+
+      - name: Build
+        # Warnings are already errors via Directory.Build.props; --no-restore keeps this
+        # honest about what the previous step produced.
+        run: dotnet build Querio.slnx --no-restore --configuration Release
+
+      - name: Test
+        # Integration tests start a real Postgres through Testcontainers, which works because
+        # the GitHub-hosted runner ships a Docker daemon. An in-memory provider would not
+        # exercise the indexes and cascades these tests exist to check.
+        run: dotnet test --solution Querio.slnx --no-build --configuration Release
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Version comes from the packageManager field in frontend/package.json. The path has
+      # to be spelled out: the action resolves it against the workspace root rather than the
+      # working-directory above, and there is no package.json at the repository root.
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Install
+        # Frozen so a lockfile that was never committed fails here rather than silently
+        # resolving to different versions than anyone tested against.
+        run: pnpm install --frozen-lockfile
+
+      - name: Formatting
+        run: pnpm format:check
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Types
+        run: pnpm typecheck
+
+      - name: Build
+        run: pnpm build
+        env:
+          # Public Firebase configuration is inlined at build time, so the build needs values
+          # present or it fails on the missing-configuration guard. These are identifiers
+          # rather than secrets — see frontend/.env.example.
+          NEXT_PUBLIC_API_BASE_URL: ${{ vars.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5063' }}
+          NEXT_PUBLIC_FIREBASE_API_KEY: ${{ vars.NEXT_PUBLIC_FIREBASE_API_KEY || 'ci-placeholder' }}
+          NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'ci.firebaseapp.com' }}
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'ci-placeholder' }}
