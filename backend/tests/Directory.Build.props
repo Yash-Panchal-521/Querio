@@ -1,0 +1,21 @@
+<Project>
+
+  <!-- Chain to backend/Directory.Build.props so shared settings still apply. -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove($(MSBuildThisFile), $(MSBuildThisFileDirectory)..))" />
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!--
+    Analyzer rules that fight test conventions rather than protect them:
+      CA1707 — Method_names_read_as_sentences is the point of a test name.
+      CA1711 — xUnit collection definitions are named "...Collection" by convention.
+      CA1861 — inline arrays in assertions are not a hot path.
+      CA2007 — there is no synchronisation context to capture in a test host.
+  -->
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);CA1707;CA1711;CA1861;CA2007</NoWarn>
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Querio.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <!--
+    Deliberately dependency-free. The domain must stay expressible without EF, ASP.NET or
+    any AI SDK; the moment one appears here, the layering has been lost.
+  -->
+
+</Project>

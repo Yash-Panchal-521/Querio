@@ -1,0 +1,36 @@
+# Normalize to LF in the repository; Git checks out platform-native line endings.
+* text=auto
+
+# Always LF — these are read by tooling that chokes on CRLF.
+*.sh            text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.json          text eol=lf
+Dockerfile      text eol=lf
+*.Dockerfile    text eol=lf
+
+# Always CRLF — Windows-only tooling.
+*.ps1           text eol=crlf
+*.cmd           text eol=crlf
+*.bat           text eol=crlf
+*.sln           text eol=crlf
+
+# Binary: never diff, never convert.
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.ico           binary
+*.webp          binary
+*.pdf           binary
+*.woff          binary
+*.woff2         binary
+*.ttf           binary
+*.otf           binary
+*.zip           binary
+*.gz            binary
+*.pfx           binary
+
+# Generated — collapse in diffs and reviews.
+pnpm-lock.yaml      linguist-generated=true -diff
+package-lock.json   linguist-generated=true -diff

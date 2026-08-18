@@ -1,0 +1,10 @@
+# Build output is regenerated inside the image; sending it wastes context and can leak a
+# host-built binary into the layer.
+**/bin/
+**/obj/
+**/TestResults/
+
+# Tests never enter the runtime image, and excluding them keeps the context small.
+tests/
+
+**/*.user

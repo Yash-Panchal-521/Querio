@@ -1,0 +1,83 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  # Re-running a deploy by hand is the fastest recovery when a provider fails mid-rollout.
+  workflow_dispatch:
+
+# Deploys queue rather than cancel. Cancelling one halfway can leave a migration applied
+# with no code deployed against it.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  migrate:
+    name: Apply migrations
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: backend/global.json
+
+      - name: Install EF tooling
+        run: dotnet tool install --global dotnet-ef --version 10.0.11
+
+      - name: Check the connection string is configured
+        # Without this the migration step fails deep inside EF with a null-reference, which
+        # tells whoever is watching nothing about what to fix.
+        run: |
+          if [ -z "${{ secrets.QUERIO_MIGRATION_CONNECTION_STRING }}" ]; then
+            echo "::error::QUERIO_MIGRATION_CONNECTION_STRING is not set on the production environment."
+            exit 1
+          fi
+
+      - name: Apply migrations
+        # Migrations run before the new code is deployed, and the readiness probe reports an
+        # instance unready while its schema is behind — so the two together mean traffic
+        # never reaches a process whose schema does not match it.
+        #
+        # The consequence to respect: during this window the OLD code is running against the
+        # NEW schema, so every migration must be backward-compatible with the release it is
+        # replacing. Add columns before writing to them; drop them a release later.
+        env:
+          # Neon's DIRECT endpoint, not the pooled one. Migrations over PgBouncer fail with
+          # `prepared statement "s0" already exists`, and a SET search_path does not survive
+          # past its own transaction. The application itself uses the pooled endpoint; only
+          # this step needs the direct one.
+          QUERIO_CONNECTION_STRING: ${{ secrets.QUERIO_MIGRATION_CONNECTION_STRING }}
+        run: |
+          dotnet ef database update \
+            --project backend/src/Querio.Infrastructure \
+            --startup-project backend/src/Querio.Infrastructure
+
+  api:
+    name: Deploy API
+    needs: migrate
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Trigger the Render deploy
+        # A deploy hook rather than Render's own GitHub auto-deploy, purely so it happens
+        # after migrations rather than racing them.
+        run: |
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            echo "::error::RENDER_DEPLOY_HOOK_URL is not set on the production environment."
+            exit 1
+          fi
+
+          curl --fail --silent --show-error --request POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+
+      - name: Note
+        run: |
+          echo "Render is now building. The instance stays out of the load balancer until"
+          echo "/health/ready passes, which includes the schema check."

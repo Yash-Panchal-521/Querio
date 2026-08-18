@@ -1,0 +1,33 @@
+# Local development dependencies. Integration tests do not use this — they start their own
+# throwaway container via Testcontainers, so tests never depend on local state.
+#
+#   docker compose up -d
+#
+services:
+  postgres:
+    # pgvector on top of Postgres 17. The extension is not needed yet, but matching the
+    # production image from the start means the first vector migration is not also the first
+    # time this image is exercised.
+    image: pgvector/pgvector:pg17
+    container_name: querio-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: querio
+      POSTGRES_USER: querio
+      # Read from .env at the repository root, which is untracked — copy .env.example. A
+      # password-shaped literal here is worth nothing to an attacker and a steady stream of
+      # noise to a secret scanner, which trains everyone to wave those alerts through.
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env - copy .env.example}"
+    ports:
+      # 5434 on the host: 5432 and 5433 are commonly already taken by other local databases.
+      - "5434:5432"
+    volumes:
+      - querio-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U querio -d querio"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  querio-postgres-data:

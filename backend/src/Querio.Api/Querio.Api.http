@@ -1,0 +1,6 @@
+@Querio.Api_HostAddress = http://localhost:5063
+
+GET {{Querio.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
