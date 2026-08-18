@@ -20,6 +20,11 @@ jobs:
     name: Apply migrations
     runs-on: ubuntu-latest
     environment: production
+    defaults:
+      run:
+        # The SDK finds global.json by walking up from the working directory, and ours sits
+        # in backend/. Same reason the CI jobs run from here.
+        working-directory: backend
 
     steps:
       - uses: actions/checkout@v4
@@ -31,14 +36,40 @@ jobs:
       - name: Install EF tooling
         run: dotnet tool install --global dotnet-ef --version 10.0.11
 
-      - name: Check the connection string is configured
-        # Without this the migration step fails deep inside EF with a null-reference, which
-        # tells whoever is watching nothing about what to fix.
+      - name: Check the connection string is usable
+        # Every check here exists because the failure it prevents is unreadable. Without them
+        # you get a null-reference from inside EF, an ArgumentException naming half a URI, or
+        # `prepared statement "s0" already exists` — none of which say what to change.
+        #
+        # The secret arrives through env rather than ${{ }} interpolation so that a value
+        # containing quotes cannot terminate the script and run as shell.
+        env:
+          CONNECTION_STRING: ${{ secrets.QUERIO_MIGRATION_CONNECTION_STRING }}
         run: |
-          if [ -z "${{ secrets.QUERIO_MIGRATION_CONNECTION_STRING }}" ]; then
+          if [ -z "$CONNECTION_STRING" ]; then
             echo "::error::QUERIO_MIGRATION_CONNECTION_STRING is not set on the production environment."
             exit 1
           fi
+
+          case "$CONNECTION_STRING" in
+            postgres://*|postgresql://*)
+              echo "::error::QUERIO_MIGRATION_CONNECTION_STRING is a URI. Npgsql does not parse those — it needs ADO.NET keyword syntax, e.g. Host=HOST;Port=5432;Database=querio;Username=USER;Password=PASS;SSL Mode=Require"
+              exit 1
+              ;;
+          esac
+
+          case "$CONNECTION_STRING" in
+            *-pooler.*)
+              echo "::error::QUERIO_MIGRATION_CONNECTION_STRING points at Neon's pooled endpoint. Migrations need the direct one — drop '-pooler' from the host. The application keeps using the pooled endpoint."
+              exit 1
+              ;;
+          esac
+
+      - name: Restore
+        # `dotnet ef database update` builds the project first, and building without a
+        # restore fails with NETSDK1004 about a missing assets file — which reads as a
+        # project problem rather than a missing step.
+        run: dotnet restore src/Querio.Infrastructure/Querio.Infrastructure.csproj
 
       - name: Apply migrations
         # Migrations run before the new code is deployed, and the readiness probe reports an
@@ -56,8 +87,8 @@ jobs:
           QUERIO_CONNECTION_STRING: ${{ secrets.QUERIO_MIGRATION_CONNECTION_STRING }}
         run: |
           dotnet ef database update \
-            --project backend/src/Querio.Infrastructure \
-            --startup-project backend/src/Querio.Infrastructure
+            --project src/Querio.Infrastructure \
+            --startup-project src/Querio.Infrastructure
 
   api:
     name: Deploy API
@@ -68,14 +99,17 @@ jobs:
     steps:
       - name: Trigger the Render deploy
         # A deploy hook rather than Render's own GitHub auto-deploy, purely so it happens
-        # after migrations rather than racing them.
+        # after migrations rather than racing them. Render's Auto-Deploy is set to Off for
+        # the same reason.
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
-          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+          if [ -z "$DEPLOY_HOOK_URL" ]; then
             echo "::error::RENDER_DEPLOY_HOOK_URL is not set on the production environment."
             exit 1
           fi
 
-          curl --fail --silent --show-error --request POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"
+          curl --fail --silent --show-error --request POST "$DEPLOY_HOOK_URL"
 
       - name: Note
         run: |
