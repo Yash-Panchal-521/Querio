@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Querio.Domain.Documents;
 using Querio.Domain.Tenants;
 using Querio.Domain.Users;
 
@@ -31,6 +32,21 @@ public interface IQuerioDbContext
     /// so that path must opt out with IgnoreQueryFilters — deliberately conspicuous.
     /// </summary>
     DbSet<Invitation> Invitations { get; }
+
+    /// <summary>Tenant-filtered. One uploaded file each.</summary>
+    DbSet<Document> Documents { get; }
+
+    /// <summary>
+    /// Tenant-filtered. Passages of a document, with the vector that makes them findable.
+    /// </summary>
+    DbSet<DocumentChunk> DocumentChunks { get; }
+
+    /// <summary>
+    /// Not tenant-filtered, and must not be: the ingestion worker runs without a request and
+    /// therefore without an organization, so a filtered queue would always be empty. The
+    /// worker adopts the job's tenant before touching anything the filter covers.
+    /// </summary>
+    DbSet<IngestionJob> IngestionJobs { get; }
 
     /// <summary>
     /// Exposed so a handler can discard tracked state after a failed save and retry — the

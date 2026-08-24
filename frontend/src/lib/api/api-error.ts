@@ -18,7 +18,11 @@ export class ApiError extends Error {
     fallbackMessage: string,
     retryAfterSeconds?: number,
   ) {
-    super(problem?.detail ?? problem?.title ?? fallbackMessage);
+    // The field error before the title, deliberately. A validation problem raised by the
+    // framework rather than by us carries no `detail`, and its title is the generic
+    // "One or more validation errors occurred." — so reaching for the title first shows a
+    // person a summary when the specific sentence was sitting in `errors` all along.
+    super(problem?.detail ?? firstFieldError(problem) ?? problem?.title ?? fallbackMessage);
 
     this.name = "ApiError";
     this.status = status;
@@ -65,4 +69,21 @@ export class ApiError extends Error {
 
     return traceId && traceId.length > 0 ? traceId : undefined;
   }
+}
+
+/**
+ * The first field error, for when there is no `detail` to show. Order within a single field is
+ * the server's; across fields it is whatever the payload happened to serialise, which is fine
+ * because this only ever runs when there is nothing better to say.
+ */
+function firstFieldError(problem: ProblemDetails | undefined): string | undefined {
+  for (const errors of Object.values(problem?.errors ?? {})) {
+    const first = errors.find((error) => error.trim().length > 0);
+
+    if (first) {
+      return first;
+    }
+  }
+
+  return undefined;
 }

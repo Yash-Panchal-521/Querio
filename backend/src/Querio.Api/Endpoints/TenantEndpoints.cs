@@ -5,6 +5,7 @@ using Querio.Application.Tenants;
 using Querio.Application.Tenants.CreateTenant;
 using Querio.Application.Tenants.DeleteTenant;
 using Querio.Application.Tenants.GetTenant;
+using Querio.Application.Tenants.GetUsage;
 using Querio.Application.Tenants.RenameTenant;
 
 namespace Querio.Api.Endpoints;
@@ -32,6 +33,16 @@ internal sealed class TenantEndpoints : IEndpoint
             .WithName("CreateTenant")
             .WithSummary("Creates an organization with the caller as its owner.")
             .Produces<TenantSummary>(StatusCodes.Status201Created);
+
+        group.MapGet($"/{{{TenantPolicies.TenantRouteKey}:guid}}/usage", async (
+                Guid tenantId,
+                IMediator mediator,
+                CancellationToken cancellationToken) =>
+                TypedResults.Ok(await mediator.Send(new GetTenantUsageQuery(tenantId), cancellationToken)))
+            .WithName("GetTenantUsage")
+            .WithSummary("Returns what this organization has stored and what it may store.")
+            .RequireAuthorization(TenantPolicies.Member)
+            .Produces<TenantUsage>();
 
         group.MapGet($"/{{{TenantPolicies.TenantRouteKey}:guid}}", async (
                 Guid tenantId,

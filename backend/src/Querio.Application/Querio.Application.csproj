@@ -22,6 +22,8 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Querio.Application.Tests" />
+    <!-- Extraction tests chunk what they extract, and the chunker lives here. -->
+    <InternalsVisibleTo Include="Querio.Api.Tests" />
   </ItemGroup>
 
 </Project>

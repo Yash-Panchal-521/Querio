@@ -18,6 +18,11 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
+    // Local development settings, git-ignored and optional. Added last so it overrides the
+    // environment file, and absent everywhere but a developer's machine — which is why it is
+    // safe to keep real credentials in it and why nothing here depends on it existing.
+    builder.Configuration.AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true);
+
     builder.AddQuerioLogging();
     builder.AddQuerioJson();
     builder.AddQuerioExceptionHandling();

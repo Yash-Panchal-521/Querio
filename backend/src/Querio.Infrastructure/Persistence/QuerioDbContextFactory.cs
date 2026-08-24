@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Pgvector.EntityFrameworkCore;
 
 namespace Querio.Infrastructure.Persistence;
 
@@ -22,7 +23,11 @@ internal sealed class QuerioDbContextFactory : IDesignTimeDbContextFactory<Queri
             ?? DesignTimeConnectionString;
 
         var options = new DbContextOptionsBuilder<QuerioDbContext>()
-            .UseNpgsql(connectionString, npgsql => npgsql.MigrationsAssembly(typeof(QuerioDbContext).Assembly.FullName))
+            .UseNpgsql(connectionString, npgsql =>
+            {
+                npgsql.MigrationsAssembly(typeof(QuerioDbContext).Assembly.FullName);
+                npgsql.UseVector();
+            })
             .UseSnakeCaseNamingConvention()
             .Options;
 

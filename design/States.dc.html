@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+  <style>
+    :root {
+      --background: #fcfbf8; --foreground: #181a21;
+      --card: #ffffff; --muted: #f5f3f0; --muted-foreground: #5a5c64;
+      --primary: #404aaf; --accent: #eaecf5; --accent-foreground: #2a2d38;
+      --border: #d8d5d1;
+      --success: #206b38; --warning: #8f520d; --destructive: #ba1d27;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Geist, ui-sans-serif, system-ui, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: #343d94; }
+    .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 3px 9px; border-radius: 999px;
+      font-size: 12px; font-weight: 500;
+    }
+  </style>
+</helmet>
+
+<div style="display: flex; flex-direction: column; gap: 20px; width: 720px; padding: 32px; background: var(--background);">
+
+  <div style="display: flex; flex-direction: column; gap: 4px;">
+    <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted-foreground);">Vocabulary</span>
+    <h2 style="margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -0.01em;">Every state a document can be in</h2>
+    <p style="margin: 0; font-size: 13px; color: var(--muted-foreground); max-width: 60ch;">Seven, because the pipeline has seven. Four of them are one idea — "working" — and the interface says which part, so a document that stalls says where.</p>
+  </div>
+
+  <div style="display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 14px; background: var(--card); overflow: hidden;">
+
+    <div style="display: flex; align-items: center; gap: 16px; padding: 13px 18px; border-bottom: 1px solid var(--border);">
+      <span class="pill" style="color: var(--muted-foreground); background: var(--muted); min-width: 104px; justify-content: center;">Queued</span>
+      <span style="font-size: 13px; color: var(--muted-foreground);">Stored, waiting for a worker. Usually under a second.</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 16px; padding: 13px 18px; border-bottom: 1px solid var(--border);">
+      <span class="pill" style="color: var(--primary); background: var(--accent); min-width: 104px; justify-content: center;">Reading</span>
+      <span style="font-size: 13px; color: var(--muted-foreground);">Pulling text out of the file. <span class="mono" style="font-size: 11px;">Extracting</span></span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 16px; padding: 13px 18px; border-bottom: 1px solid var(--border);">
+      <span class="pill" style="color: var(--primary); background: var(--accent); min-width: 104px; justify-content: center;">Splitting</span>
+      <span style="font-size: 13px; color: var(--muted-foreground);">Dividing it into passages. <span class="mono" style="font-size: 11px;">Chunking</span></span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 16px; padding: 13px 18px; border-bottom: 1px solid var(--border);">
+      <span class="pill" style="color: var(--primary); background: var(--accent); min-width: 104px; justify-content: center;">Embedding</span>
+      <span style="font-size: 13px; color: var(--muted-foreground);">The only one that shows a count, because it is the only one that takes long enough to want one.</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 16px; padding: 13px 18px; border-bottom: 1px solid var(--border);">
+      <span class="pill" style="color: var(--warning); background: rgba(143, 82, 13, 0.09); min-width: 104px; justify-content: center;">Paused</span>
+      <span style="font-size: 13px; color: var(--muted-foreground);">Amber, not red. The daily allowance ran out — nothing is wrong and nobody needs to act.</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 16px; padding: 13px 18px; border-bottom: 1px solid var(--border);">
+      <span class="pill" style="color: var(--success); background: rgba(32, 107, 56, 0.09); min-width: 104px; justify-content: center;">
+        <svg viewBox="0 0 24 24" fill="none" style="width: 13px; height: 13px;" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        Ready
+      </span>
+      <span style="font-size: 13px; color: var(--muted-foreground);">Searchable. The only state where the passage count is the headline.</span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 16px; padding: 13px 18px;">
+      <span class="pill" style="color: var(--destructive); background: rgba(186, 29, 39, 0.08); min-width: 104px; justify-content: center;">Failed</span>
+      <span style="font-size: 13px; color: var(--muted-foreground);">Always carries its reason in the row, and the reason names the fix.</span>
+    </div>
+
+  </div>
+
+  <p style="margin: 0; font-size: 12px; color: var(--muted-foreground); max-width: 62ch;">The interface names states for what they mean to a reader — Reading, Splitting — rather than for what the code calls them. Paused is deliberately not a failure colour: treating it as one invites a re-upload that spends the same allowance again when it returns.</p>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

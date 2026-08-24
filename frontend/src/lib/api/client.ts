@@ -91,11 +91,31 @@ async function readProblemDetails(response: Response): Promise<ProblemDetails | 
   }
 }
 
+/** The body, plus the status for the rare caller that needs to tell 200 from 201. */
+export interface ApiResult<T> {
+  data: T;
+  status: number;
+}
+
 /**
  * Single entry point for talking to the Querio API. Failures always surface as ApiError,
  * so callers never have to remember to check `response.ok`.
  */
 export async function apiFetch<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
+  return (await apiFetchResult<T>(path, options)).data;
+}
+
+/**
+ * As `apiFetch`, but keeps the status code.
+ *
+ * Almost nothing needs this — a success is a success. Uploading a document does: the API
+ * answers 201 for a new one and 200 for a file this organization already has, and the
+ * interface has to say which rather than appear to do nothing.
+ */
+export async function apiFetchResult<T>(
+  path: string,
+  options: ApiRequestOptions = {},
+): Promise<ApiResult<T>> {
   const { body, searchParams, headers, anonymous, ...rest } = options;
 
   const requestHeaders = new Headers(headers);
@@ -154,8 +174,8 @@ export async function apiFetch<T>(path: string, options: ApiRequestOptions = {})
 
   // 204, or any success the API deliberately returns without a body.
   if (response.status === 204 || response.headers.get("Content-Length") === "0") {
-    return undefined as T;
+    return { data: undefined as T, status: response.status };
   }
 
-  return (await response.json()) as T;
+  return { data: (await response.json()) as T, status: response.status };
 }

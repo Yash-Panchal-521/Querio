@@ -45,7 +45,35 @@
          that is an unresolved binding conflict, so pin the whole EF stack to one version. -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.11" />
     <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    <!--
+      Vector storage and HNSW index DDL. Built against EF Core 9 but supported on 10, which
+      was verified against a real database before the schema was designed around it.
+    -->
+    <PackageVersion Include="Pgvector.EntityFrameworkCore" Version="0.3.0" />
     <PackageVersion Include="EFCore.NamingConventions" Version="10.0.1" />
+    <!--
+      R2 speaks the S3 API, so this is the client for it. The same code runs against MinIO in
+      tests, which is what lets CI exercise the real storage path without Cloudflare
+      credentials.
+    -->
+    <PackageVersion Include="AWSSDK.S3" Version="4.0.102.2" />
+  </ItemGroup>
+
+  <!-- Text extraction. Both permissively licensed, which the free-tier-only rule requires. -->
+  <ItemGroup>
+    <PackageVersion Include="PdfPig" Version="0.1.15" />
+    <PackageVersion Include="DocumentFormat.OpenXml" Version="3.5.1" />
+  </ItemGroup>
+
+  <!--
+    Embeddings. Only the abstractions: the transport is our own HTTP client against Gemini's
+    native API, because the OpenAI-compatibility layer silently ignores parameters it does not
+    support and we depend on two of them. See ADR 0004.
+  -->
+  <ItemGroup>
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.11" />
+    <!-- In the ASP.NET shared framework but not the base one, so a class library needs it. -->
+    <PackageVersion Include="System.Threading.RateLimiting" Version="10.0.11" />
   </ItemGroup>
 
   <!-- Abstractions the class libraries need without dragging in the hosting stack. -->
@@ -54,6 +82,7 @@
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.11" />
     <PackageVersion Include="Microsoft.Extensions.Diagnostics.HealthChecks" Version="10.0.11" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.11" />
   </ItemGroup>
 
   <!-- Logging -->
@@ -80,7 +109,9 @@
     <!-- Real Postgres for integration tests: an in-memory provider cannot verify the
          constraints, indexes and pgvector behaviour we actually depend on. -->
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.14.0" />
+    <PackageVersion Include="Testcontainers.Minio" Version="4.14.0" />
     <PackageVersion Include="Microsoft.Extensions.TimeProvider.Testing" Version="10.9.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.11" />
     <!-- Tests mint their own RS256 tokens so the real JwtBearer path runs end to end. -->
     <PackageVersion Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.22.0" />
     <PackageVersion Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.22.0" />

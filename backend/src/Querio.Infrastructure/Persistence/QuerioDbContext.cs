@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Querio.Application.Common.Abstractions;
 using Querio.Domain.Common;
+using Querio.Domain.Documents;
 using Querio.Domain.Tenants;
 using Querio.Domain.Users;
 
@@ -18,6 +19,16 @@ public sealed class QuerioDbContext(DbContextOptions<QuerioDbContext> options, I
 
     public DbSet<Invitation> Invitations => Set<Invitation>();
 
+    public DbSet<Document> Documents => Set<Document>();
+
+    public DbSet<DocumentChunk> DocumentChunks => Set<DocumentChunk>();
+
+    /// <summary>
+    /// Not tenant-filtered, deliberately — see <see cref="IngestionJob"/>. The worker runs
+    /// without a request and so without an organization; a filtered queue would be empty.
+    /// </summary>
+    public DbSet<IngestionJob> IngestionJobs => Set<IngestionJob>();
+
     /// <summary>
     /// Read through a property rather than captured, so EF turns it into a query parameter
     /// re-evaluated per request instead of baking the first request's tenant into the model.
@@ -27,6 +38,11 @@ public sealed class QuerioDbContext(DbContextOptions<QuerioDbContext> options, I
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Declared on the model rather than assumed to exist: the migration that creates it
+        // is generated from here, so a fresh database gets the extension before the first
+        // vector column needs it.
+        modelBuilder.HasPostgresExtension("vector");
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
@@ -50,6 +66,12 @@ public sealed class QuerioDbContext(DbContextOptions<QuerioDbContext> options, I
         // is missed, because a forgotten filter is silent.
         modelBuilder.Entity<Invitation>()
             .HasQueryFilter(invitation => CurrentTenantId != null && invitation.TenantId == CurrentTenantId);
+
+        modelBuilder.Entity<Document>()
+            .HasQueryFilter(document => CurrentTenantId != null && document.TenantId == CurrentTenantId);
+
+        modelBuilder.Entity<DocumentChunk>()
+            .HasQueryFilter(chunk => CurrentTenantId != null && chunk.TenantId == CurrentTenantId);
     }
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)

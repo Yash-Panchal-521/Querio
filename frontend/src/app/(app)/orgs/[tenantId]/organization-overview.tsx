@@ -1,11 +1,15 @@
 "use client";
 
+import { useCallback } from "react";
 import Link from "next/link";
 import { FileText, MessageSquareQuote, Settings, Upload, Users } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
 import { Card, EmptyState, Page, PageHeader } from "@/components/app/page-shell";
 import { OrganizationGate } from "@/components/app/organization-gate";
 import { SetupChecklist } from "@/components/app/setup-checklist";
+import { getTenantUsage } from "@/lib/api/documents";
+import type { Organization } from "@/lib/api/me";
+import { useAsyncData } from "@/lib/use-async-data";
 import { useOrganizations } from "@/lib/auth/use-organizations";
 
 export function OrganizationOverview() {
@@ -22,6 +26,17 @@ function Overview() {
   if (!active) {
     return null;
   }
+
+  // Split so the data hook sits above no early return — the organization is resolved first,
+  // then everything that depends on it.
+  return <OverviewFor active={active} />;
+}
+
+function OverviewFor({ active }: { active: Organization }) {
+  const load = useCallback(() => getTenantUsage(active.id), [active.id]);
+  const { data: usage } = useAsyncData(load);
+
+  const documentCount = usage?.documentCount ?? 0;
 
   return (
     <Page>
@@ -49,18 +64,43 @@ function Overview() {
       <div className="grid gap-4 sm:grid-cols-3">
         <Stat label="Your role" value={active.role} icon={Users} />
         <Stat label="Members" value={String(active.memberCount)} icon={Users} />
-        <Stat label="Documents" value="0" icon={FileText} />
+        <Stat label="Documents" value={usage ? String(documentCount) : "—"} icon={FileText} />
       </div>
 
       <Card
         title="Documents"
-        description="Upload PDFs, Markdown or plain text. Querio reads them and answers from what it finds."
+        description="Upload PDFs, Word documents, Markdown or plain text. Querio reads them and answers from what it finds."
+        actions={
+          documentCount > 0 ? (
+            <Link
+              href={`/orgs/${active.id}/documents`}
+              className={buttonClasses({ variant: "secondary", size: "sm" })}
+            >
+              View all
+            </Link>
+          ) : undefined
+        }
       >
-        <EmptyState
-          icon={Upload}
-          title="No documents yet"
-          description="Uploading and asking questions arrive with the next release. This organization is ready for them."
-        />
+        {documentCount > 0 ? (
+          <p className="text-muted-foreground text-sm">
+            {documentCount} document{documentCount === 1 ? "" : "s"} stored, searchable by everyone
+            in {active.name}.
+          </p>
+        ) : (
+          <EmptyState
+            icon={Upload}
+            title="No documents yet"
+            description="Add one and Querio will read it, split it into passages and make it searchable."
+            action={
+              <Link
+                href={`/orgs/${active.id}/documents`}
+                className={buttonClasses({ variant: "primary", size: "sm" })}
+              >
+                Upload a document
+              </Link>
+            }
+          />
+        )}
       </Card>
 
       <Card
@@ -69,8 +109,8 @@ function Overview() {
       >
         <EmptyState
           icon={MessageSquareQuote}
-          title="Nothing to ask yet"
-          description="Once documents are uploaded, this is where you will ask about them."
+          title="Asking arrives next"
+          description="Documents are already being read and indexed. Answering questions from them is the next release."
         />
       </Card>
     </Page>

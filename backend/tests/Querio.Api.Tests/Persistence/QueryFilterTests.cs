@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Querio.Api.Tests.Api;
 using Querio.Domain.Common;
+using Querio.Domain.Documents;
 using Querio.Domain.Tenants;
 using Querio.Infrastructure.Persistence;
 
@@ -44,6 +45,8 @@ public sealed class QueryFilterTests(QuerioApiFixture fixture)
             .ToArray();
 
         tenantOwned.ShouldContain(typeof(Invitation));
+        tenantOwned.ShouldContain(typeof(Document));
+        tenantOwned.ShouldContain(typeof(DocumentChunk));
     }
 
     [Fact]
@@ -59,5 +62,26 @@ public sealed class QueryFilterTests(QuerioApiFixture fixture)
 
         membership.ShouldNotBeNull();
         membership.GetDeclaredQueryFilters().ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void Ingestion_jobs_are_deliberately_not_filtered()
+    {
+        using var scope = fixture.Factory.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<QuerioDbContext>();
+
+        // The worker runs without a request and therefore without an organization, so a
+        // filtered queue would always be empty and nothing would ever be ingested. Isolation
+        // is not weakened: the job names its tenant, and the worker adopts it before reading
+        // or writing anything the filter covers.
+        var job = dbContext.Model.FindEntityType(typeof(IngestionJob));
+
+        job.ShouldNotBeNull();
+        job.GetDeclaredQueryFilters().ShouldBeEmpty();
+
+        // The exception is only safe while the escape hatch stays closed — if IngestionJob
+        // ever starts implementing IHasTenant, the filter test above would begin failing and
+        // this comment would be the only clue why.
+        typeof(IHasTenant).IsAssignableFrom(typeof(IngestionJob)).ShouldBeFalse();
     }
 }

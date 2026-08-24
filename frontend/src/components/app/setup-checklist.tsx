@@ -3,6 +3,7 @@
 import { useCallback, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { Check, FileText, MailCheck, PartyPopper, Users, X } from "lucide-react";
+import { getTenantUsage } from "@/lib/api/documents";
 import { listInvitations } from "@/lib/api/invitations";
 import type { Organization } from "@/lib/api/me";
 import { Button } from "@/components/ui/button";
@@ -19,7 +20,6 @@ interface Step {
   done: boolean;
   href?: string;
   action?: string;
-  soon?: boolean;
 }
 
 /**
@@ -36,8 +36,11 @@ export function SetupChecklist({ organization }: { organization: Organization })
   const { session } = useSession();
   const [dismissed, setDismissed] = useState(false);
 
-  const load = useCallback(() => listInvitations(organization.id), [organization.id]);
-  const { data: invitations } = useAsyncData(load);
+  const loadInvitations = useCallback(() => listInvitations(organization.id), [organization.id]);
+  const { data: invitations } = useAsyncData(loadInvitations);
+
+  const loadUsage = useCallback(() => getTenantUsage(organization.id), [organization.id]);
+  const { data: usage } = useAsyncData(loadUsage);
 
   // localStorage cannot be read while rendering on the server, and reading it during the
   // first client render would disagree with the server's markup. Asking "am I hydrated" as
@@ -93,14 +96,14 @@ export function SetupChecklist({ organization }: { organization: Organization })
       label: "Upload a document",
       description: "Answers are drawn only from what you upload.",
       icon: FileText,
-      done: false,
-      soon: true,
+      done: (usage?.documentCount ?? 0) > 0,
+      href: `/orgs/${organization.id}/documents`,
+      action: "Upload",
     },
   ];
 
-  const actionable = steps.filter((step) => !step.soon);
-  const completed = actionable.filter((step) => step.done).length;
-  const allDone = completed === actionable.length;
+  const completed = steps.filter((step) => step.done).length;
+  const allDone = completed === steps.length;
 
   function dismiss() {
     dismissOnboarding(organization.id);
@@ -117,8 +120,8 @@ export function SetupChecklist({ organization }: { organization: Organization })
           </h2>
           <p className="text-muted-foreground text-xs">
             {allDone
-              ? "Nothing left to do here. Uploading documents arrives with the next release."
-              : `${completed} of ${actionable.length} done — a couple of minutes at most.`}
+              ? "Nothing left to do here. Ask-a-question arrives with the next release."
+              : `${completed} of ${steps.length} done — a couple of minutes at most.`}
           </p>
         </div>
 
@@ -132,19 +135,13 @@ export function SetupChecklist({ organization }: { organization: Organization })
       <div className="bg-muted h-1.5 overflow-hidden rounded-full" aria-hidden="true">
         <div
           className="bg-primary h-full rounded-full transition-[width] duration-500"
-          style={{ width: `${(completed / actionable.length) * 100}%` }}
+          style={{ width: `${(completed / steps.length) * 100}%` }}
         />
       </div>
 
       <ul className="flex flex-col gap-1">
         {steps.map((step) => (
-          <li
-            key={step.id}
-            className={cn(
-              "flex flex-wrap items-center gap-3 rounded-md px-2 py-2",
-              step.soon && "opacity-55",
-            )}
-          >
+          <li key={step.id} className="flex flex-wrap items-center gap-3 rounded-md px-2 py-2">
             <span
               className={cn(
                 "flex size-6 shrink-0 items-center justify-center rounded-full border",
@@ -167,12 +164,6 @@ export function SetupChecklist({ organization }: { organization: Organization })
               </span>
               <span className="text-muted-foreground text-xs text-pretty">{step.description}</span>
             </div>
-
-            {step.soon ? (
-              <span className="border-border text-muted-foreground rounded border px-1.5 py-0.5 text-[10px] tracking-wide uppercase">
-                Soon
-              </span>
-            ) : null}
 
             {!step.done && step.href && step.action ? (
               <Link href={step.href} className="text-primary text-sm font-medium hover:underline">

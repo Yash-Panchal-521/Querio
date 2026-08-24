@@ -72,7 +72,15 @@ public sealed class QuerioApiFixture : IAsyncLifetime
         await using var scope = Factory.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<QuerioDbContext>();
 
-        await dbContext.Database.ExecuteSqlRawAsync("TRUNCATE TABLE users RESTART IDENTITY CASCADE;");
+        // Both roots, not just users. Truncating users cascades only to what references users
+        // — memberships — leaving organizations behind, and with them their documents, chunks
+        // and queued jobs. A test would then see another test's uploads.
+        await dbContext.Database.ExecuteSqlRawAsync(
+            "TRUNCATE TABLE users, tenants RESTART IDENTITY CASCADE;");
+
+        Factory.DocumentStorage.Clear();
+        Factory.Embeddings.NextFailure = null;
+        Factory.Embeddings.FailAfterCalls = 0;
     }
 
     public async ValueTask DisposeAsync()

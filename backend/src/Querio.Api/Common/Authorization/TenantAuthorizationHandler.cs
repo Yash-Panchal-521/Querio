@@ -17,7 +17,7 @@ internal sealed class TenantAuthorizationHandler(
     IHttpContextAccessor httpContextAccessor,
     IQuerioDbContext dbContext,
     ICurrentUser currentUser,
-    TenantContext tenantContext,
+    ITenantScope tenantScope,
     IMemoryCache cache) : AuthorizationHandler<TenantRoleRequirement>
 {
     /// <summary>
@@ -66,7 +66,7 @@ internal sealed class TenantAuthorizationHandler(
             return;
         }
 
-        tenantContext.Establish(tenantId);
+        tenantScope.Establish(tenantId);
 
         context.Succeed(requirement);
     }

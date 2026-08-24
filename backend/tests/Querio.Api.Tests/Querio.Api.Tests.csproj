@@ -12,6 +12,12 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Testcontainers.PostgreSql" />
+    <PackageReference Include="Testcontainers.Minio" />
+    <!-- Builds a real .docx in TextExtractorTests, with the library that reads it. -->
+    <PackageReference Include="DocumentFormat.OpenXml" />
+    <!-- The live embedding check reads the API project's user secrets, so the key stays out of
+         the repository and out of the test command line. -->
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" />

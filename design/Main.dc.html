@@ -1,0 +1,218 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+  <style>
+    :root {
+      --background: #fcfbf8; --foreground: #181a21;
+      --card: #ffffff; --muted: #f5f3f0; --muted-foreground: #5a5c64;
+      --primary: #404aaf; --primary-foreground: #f9fafd;
+      --secondary: #f2efeb; --accent: #eaecf5; --accent-foreground: #2a2d38;
+      --border: #d8d5d1; --input: #93908b; --ring: #5867c8;
+      --success: #206b38; --warning: #8f520d; --destructive: #ba1d27;
+      --citation: #12676b; --citation-subtle: #d8f5f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Geist, ui-sans-serif, system-ui, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: #343d94; }
+    .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+  </style>
+</helmet>
+
+<div style="display: flex; width: 1280px; height: 920px; overflow: hidden;">
+
+  <!-- Sidebar: w-60, border-r, bg-muted/30 — as in app-shell.tsx -->
+  <aside style="display: flex; flex-direction: column; width: 240px; flex-shrink: 0; border-right: 1px solid var(--border); background: rgba(245, 243, 240, 0.3); padding: 12px 12px 16px;">
+    <div style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; margin-bottom: 12px;">
+      <svg viewBox="0 0 24 24" fill="none" style="width: 24px; height: 24px; color: var(--primary);" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor" stroke-width="1.8"></circle>
+        <path d="M7.5 8h6M7.5 11h6M7.5 14h3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+        <path d="m16.2 16.2 4.3 4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span style="font-weight: 600; letter-spacing: -0.01em;">Querio</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <a href="#" style="display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: 8px; font-size: 14px; color: var(--muted-foreground);">
+        <svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;" aria-hidden="true"><path d="M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+        Overview
+      </a>
+      <a href="#" style="display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: 8px; font-size: 14px; font-weight: 500; background: var(--accent); color: var(--accent-foreground);">
+        <svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;" aria-hidden="true"><path d="M6 3h7l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path><path d="M13 3v5h5M8.5 13h7M8.5 16.5h4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>
+        Documents
+      </a>
+      <a href="#" style="display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: 8px; font-size: 14px; color: var(--muted-foreground);">
+        <svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;" aria-hidden="true"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.6"></circle><path d="M3.5 19a5.5 5.5 0 0 1 11 0M16 11.2a3 3 0 0 0 0-5.9M17.5 19a5 5 0 0 0-2.2-4.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path></svg>
+        Members
+      </a>
+      <a href="#" style="display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: 8px; font-size: 14px; color: var(--muted-foreground);">
+        <svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;" aria-hidden="true"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-3-1.2l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.2-3l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 3 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9h.2a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"></path></svg>
+        Settings
+      </a>
+    </div>
+  </aside>
+
+  <div style="display: flex; flex-direction: column; flex: 1; min-width: 0;">
+
+    <!-- Header: h-14, border-b -->
+    <header style="display: flex; align-items: center; gap: 12px; height: 56px; flex-shrink: 0; padding: 0 16px; border-bottom: 1px solid var(--border); background: rgba(252, 251, 248, 0.8);">
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 13px; color: var(--muted-foreground);">Northwind Trading</span>
+        <span style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 999px; background: var(--accent); color: var(--accent-foreground); font-size: 12px; font-weight: 500;">AL</span>
+      </div>
+    </header>
+
+    <!-- Page: max-w-4xl, px-6 py-10, gap-8 -->
+    <main style="display: flex; flex-direction: column; gap: 32px; width: 100%; max-width: 896px; margin: 0 auto; padding: 40px 24px;">
+
+      <div style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px;">
+        <div style="display: flex; flex-direction: column; gap: 4px; min-width: 0;">
+          <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted-foreground);">Northwind Trading</span>
+          <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Documents</h1>
+          <p style="margin: 0; font-size: 14px; color: var(--muted-foreground); max-width: 65ch;">Everything here is searchable by everyone in this organization.</p>
+        </div>
+        <button style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; padding: 0 16px; border: 0; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 500; color: var(--primary-foreground); background: var(--primary); box-shadow: 0 1px 2px rgba(24, 26, 33, 0.08), inset 0 0 0 1px rgba(64, 74, 175, 0.2); cursor: pointer;">
+          <svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          Upload
+        </button>
+      </div>
+
+      <!-- Usage: a strip, not a card. It is context for the list, not a section of its own. -->
+      <div style="display: flex; align-items: center; gap: 20px; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; background: var(--muted);">
+        <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px;">
+            <span style="color: var(--muted-foreground);">Storage</span>
+            <span class="mono" style="color: var(--muted-foreground);">118 MB of 500 MB</span>
+          </div>
+          <div style="height: 5px; border-radius: 999px; background: var(--border); overflow: hidden;">
+            <div style="width: 23.6%; height: 100%; border-radius: 999px; background: var(--primary);"></div>
+          </div>
+        </div>
+        <div style="width: 1px; height: 28px; background: var(--border);"></div>
+        <div style="display: flex; flex-direction: column; gap: 2px; text-align: right;">
+          <span class="mono" style="font-size: 13px; font-weight: 500;">6 of 200</span>
+          <span style="font-size: 12px; color: var(--muted-foreground);">documents</span>
+        </div>
+      </div>
+
+      <!-- List -->
+      <section style="display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 14px; background: var(--card); box-shadow: 0 1px 2px rgba(24, 26, 33, 0.04); overflow: hidden;">
+
+        <!-- Ready -->
+        <div style="display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--border);">
+          <span style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px; background: var(--muted); color: var(--muted-foreground);">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 18px; height: 18px;" aria-hidden="true"><path d="M6 3h7l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path><path d="M13 3v5h5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+          </span>
+          <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;">
+            <span style="font-size: 14px; font-weight: 500;">Employee handbook 2026.pdf</span>
+            <span style="font-size: 12px; color: var(--muted-foreground);">2.4 MB · 148 passages · uploaded by Ada Lovelace</span>
+          </div>
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--success); background: rgba(32, 107, 56, 0.09);">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 13px; height: 13px;" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            Ready
+          </span>
+          <button style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: var(--muted-foreground); cursor: pointer;" aria-label="More">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;" aria-hidden="true"><circle cx="12" cy="5" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="19" r="1.6" fill="currentColor"></circle></svg>
+          </button>
+        </div>
+
+        <!-- Embedding: progress is the status. A spinner would say "working" and nothing else. -->
+        <div style="display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--border);">
+          <span style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px; background: var(--accent); color: var(--primary);">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 18px; height: 18px;" aria-hidden="true"><path d="M6 3h7l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path><path d="M13 3v5h5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+          </span>
+          <div style="display: flex; flex-direction: column; gap: 5px; min-width: 0; flex: 1;">
+            <span style="font-size: 14px; font-weight: 500;">Supplier agreements Q3.docx</span>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="height: 4px; width: 180px; border-radius: 999px; background: var(--border); overflow: hidden;">
+                <div style="width: 43%; height: 100%; border-radius: 999px; background: var(--primary);"></div>
+              </div>
+              <span class="mono" style="font-size: 12px; color: var(--muted-foreground);">18 of 42 passages</span>
+            </div>
+          </div>
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--primary); background: var(--accent);">
+            Embedding
+          </span>
+          <button style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: var(--muted-foreground); cursor: pointer;" aria-label="More">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;" aria-hidden="true"><circle cx="12" cy="5" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="19" r="1.6" fill="currentColor"></circle></svg>
+          </button>
+        </div>
+
+        <!-- Waiting for quota: amber, not red. Nothing is broken and nobody needs to act. -->
+        <div style="display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--border);">
+          <span style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px; background: rgba(143, 82, 13, 0.09); color: var(--warning);">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 18px; height: 18px;" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"></circle><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </span>
+          <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;">
+            <span style="font-size: 14px; font-weight: 500;">Safety procedures.pdf</span>
+            <span style="font-size: 12px; color: var(--muted-foreground);">Waiting for the daily embedding allowance to reset. Resumes automatically at midnight UTC — nothing to do.</span>
+          </div>
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--warning); background: rgba(143, 82, 13, 0.09);">
+            Paused
+          </span>
+          <button style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: var(--muted-foreground); cursor: pointer;" aria-label="More">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;" aria-hidden="true"><circle cx="12" cy="5" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="19" r="1.6" fill="currentColor"></circle></svg>
+          </button>
+        </div>
+
+        <!-- Failed: the reason is the row, not a tooltip. And it names the fix. -->
+        <div style="display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--border);">
+          <span style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px; background: rgba(186, 29, 39, 0.08); color: var(--destructive);">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 18px; height: 18px;" aria-hidden="true"><circle cx="12" cy="12" r="8.5" stroke="currentColor" stroke-width="1.6"></circle><path d="M12 7.8v5M12 15.8v.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path></svg>
+          </span>
+          <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;">
+            <span style="font-size: 14px; font-weight: 500;">Scanned invoices 2025.pdf</span>
+            <span style="font-size: 12px; color: var(--destructive);">No readable text was found. If this is a scan, it needs converting to text first.</span>
+          </div>
+          <button style="display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--background); font-family: inherit; font-size: 12px; font-weight: 500; color: var(--foreground); cursor: pointer;">Replace</button>
+          <button style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: var(--muted-foreground); cursor: pointer;" aria-label="More">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;" aria-hidden="true"><circle cx="12" cy="5" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="19" r="1.6" fill="currentColor"></circle></svg>
+          </button>
+        </div>
+
+        <!-- Ready, markdown -->
+        <div style="display: flex; align-items: center; gap: 14px; padding: 14px 20px;">
+          <span style="display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; flex-shrink: 0; border-radius: 8px; background: var(--muted); color: var(--muted-foreground);">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 18px; height: 18px;" aria-hidden="true"><path d="M6 3h7l5 5v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path><path d="M13 3v5h5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"></path></svg>
+          </span>
+          <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1;">
+            <span style="font-size: 14px; font-weight: 500;">Onboarding checklist.md</span>
+            <span style="font-size: 12px; color: var(--muted-foreground);">18 KB · 6 passages · uploaded by Grace Hopper</span>
+          </div>
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--success); background: rgba(32, 107, 56, 0.09);">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 13px; height: 13px;" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            Ready
+          </span>
+          <button style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: var(--muted-foreground); cursor: pointer;" aria-label="More">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;" aria-hidden="true"><circle cx="12" cy="5" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="19" r="1.6" fill="currentColor"></circle></svg>
+          </button>
+        </div>
+
+      </section>
+    </main>
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -104,7 +104,6 @@ function SidebarContents({ onNavigate }: { onNavigate?: () => void }) {
           active={pathname === `${base}/documents`}
           disabled={!base}
           onNavigate={onNavigate}
-          badge="Soon"
         />
         <NavItem
           href={base ? `${base}/members` : "/orgs"}

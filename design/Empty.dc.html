@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+  <style>
+    :root {
+      --background: #fcfbf8; --foreground: #181a21;
+      --card: #ffffff; --muted: #f5f3f0; --muted-foreground: #5a5c64;
+      --primary: #404aaf; --primary-foreground: #f9fafd;
+      --accent: #eaecf5; --accent-foreground: #2a2d38;
+      --border: #d8d5d1; --input: #93908b;
+      --citation: #12676b; --citation-subtle: #d8f5f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Geist, ui-sans-serif, system-ui, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: #343d94; }
+    .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+  </style>
+</helmet>
+
+<div style="display: flex; width: 1280px; height: 920px; overflow: hidden;">
+
+  <aside style="display: flex; flex-direction: column; width: 240px; flex-shrink: 0; border-right: 1px solid var(--border); background: rgba(245, 243, 240, 0.3); padding: 12px 12px 16px;">
+    <div style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; margin-bottom: 12px;">
+      <svg viewBox="0 0 24 24" fill="none" style="width: 24px; height: 24px; color: var(--primary);" aria-hidden="true">
+        <circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor" stroke-width="1.8"></circle>
+        <path d="M7.5 8h6M7.5 11h6M7.5 14h3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+        <path d="m16.2 16.2 4.3 4.3" stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+      </svg>
+      <span style="font-weight: 600; letter-spacing: -0.01em;">Querio</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 2px;">
+      <a href="#" style="display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: 8px; font-size: 14px; color: var(--muted-foreground);">Overview</a>
+      <a href="#" style="display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: 8px; font-size: 14px; font-weight: 500; background: var(--accent); color: var(--accent-foreground);">Documents</a>
+      <a href="#" style="display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: 8px; font-size: 14px; color: var(--muted-foreground);">Members</a>
+      <a href="#" style="display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: 8px; font-size: 14px; color: var(--muted-foreground);">Settings</a>
+    </div>
+  </aside>
+
+  <div style="display: flex; flex-direction: column; flex: 1; min-width: 0;">
+    <header style="display: flex; align-items: center; gap: 12px; height: 56px; flex-shrink: 0; padding: 0 16px; border-bottom: 1px solid var(--border); background: rgba(252, 251, 248, 0.8);">
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 8px;">
+        <span style="font-size: 13px; color: var(--muted-foreground);">Northwind Trading</span>
+        <span style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 999px; background: var(--accent); color: var(--accent-foreground); font-size: 12px; font-weight: 500;">AL</span>
+      </div>
+    </header>
+
+    <main style="display: flex; flex-direction: column; gap: 32px; width: 100%; max-width: 896px; margin: 0 auto; padding: 40px 24px;">
+      <div style="display: flex; flex-direction: column; gap: 4px;">
+        <span style="font-size: 12px; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted-foreground);">Northwind Trading</span>
+        <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Documents</h1>
+        <p style="margin: 0; font-size: 14px; color: var(--muted-foreground); max-width: 65ch;">Everything here is searchable by everyone in this organization.</p>
+      </div>
+
+      <!--
+        The empty state IS the upload surface, rather than an illustration with a button
+        beside it. There is exactly one thing to do here and the whole panel does it.
+      -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 64px 32px; border: 1.5px dashed var(--input); border-radius: 14px; background: var(--card); text-align: center;">
+        <span style="display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; border-radius: 999px; background: var(--accent); color: var(--primary);">
+          <svg viewBox="0 0 24 24" fill="none" style="width: 24px; height: 24px;" aria-hidden="true"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        </span>
+
+        <div style="display: flex; flex-direction: column; gap: 6px;">
+          <p style="margin: 0; font-size: 16px; font-weight: 500;">Add the first document</p>
+          <p style="margin: 0; font-size: 14px; color: var(--muted-foreground); max-width: 46ch;">Drop a file here, or choose one. Everyone in Northwind Trading will be able to ask questions of it.</p>
+        </div>
+
+        <button style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; margin-top: 4px; padding: 0 16px; border: 0; border-radius: 8px; font-family: inherit; font-size: 14px; font-weight: 500; color: var(--primary-foreground); background: var(--primary); box-shadow: 0 1px 2px rgba(24, 26, 33, 0.08), inset 0 0 0 1px rgba(64, 74, 175, 0.2); cursor: pointer;">Choose a file</button>
+
+        <p class="mono" style="margin: 6px 0 0; font-size: 12px; color: var(--muted-foreground);">PDF · DOCX · Markdown · plain text — up to 20 MB</p>
+      </div>
+
+      <!--
+        Stated here rather than discovered at the boundary. These are real limits of the
+        free tiers this runs on, and a limit somebody only meets by hitting it reads as a bug.
+      -->
+      <p style="margin: -12px 0 0; font-size: 12px; color: var(--muted-foreground); text-align: center;">This organization can store 200 documents, up to 500 MB in total.</p>
+    </main>
+  </div>
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

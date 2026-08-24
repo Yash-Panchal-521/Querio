@@ -28,6 +28,9 @@ internal static class RateLimitingExtensions
             options.AddPolicy(RateLimitPolicies.InvitationRedemption, httpContext =>
                 PartitionByCaller(httpContext, limits.InvitationRedemption));
 
+            options.AddPolicy(RateLimitPolicies.DocumentUpload, httpContext =>
+                PartitionByCaller(httpContext, limits.DocumentUpload));
+
             options.OnRejected = WriteRejectionAsync;
         });
 
