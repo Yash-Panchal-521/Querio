@@ -1,7 +1,9 @@
 using System.Reflection;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Querio.Application.Common.Abstractions;
 using Querio.Application.Common.Behaviors;
+using Querio.Application.Documents.Chunking;
 
 namespace Querio.Application;
 
@@ -27,6 +29,10 @@ public static class DependencyInjection
         });
 
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly(), includeInternalTypes: true);
+
+        // Chunking is pure logic with no external dependency, so it lives here rather than in
+        // Infrastructure — which also means it can be tested without a container.
+        services.AddSingleton<IChunker, StructureAwareChunker>();
 
         return services;
     }

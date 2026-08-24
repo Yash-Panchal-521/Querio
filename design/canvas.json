@@ -1,0 +1,33 @@
+{
+  "artboards": [
+    { "file": "Empty.dc.html", "x": 0, "y": 0, "w": 1280, "h": 920, "title": "Documents — nothing yet" },
+    { "file": "Main.dc.html", "x": 1400, "y": 0, "w": 1280, "h": 920, "title": "Documents — in use" },
+    { "file": "Uploading.dc.html", "x": 0, "y": 1040, "w": 1000, "h": 900, "title": "Upload — the three moments" },
+    { "file": "Inspector.dc.html", "x": 1120, "y": 1040, "w": 940, "h": 1000, "title": "Passage inspector" },
+    { "file": "States.dc.html", "x": 2180, "y": 1040, "w": 720, "h": 700, "title": "Status vocabulary" }
+  ],
+  "annotations": [
+    {
+      "id": "start-here",
+      "x": 0,
+      "y": -150,
+      "w": 420,
+      "text": "Read left to right, top row first.\n\nEverything is lifted from the shipped design system — Geist, the oklch tokens resolved to hex, the Page/PageHeader/Card rhythm, 8px control radii, 14px card radii. Nothing here invents a second visual language."
+    },
+    {
+      "id": "quota-note",
+      "x": 1400,
+      "y": -150,
+      "w": 420,
+      "text": "The usage strip sits above the list rather than in Settings.\n\nThese free tiers are finite enough that people will reach them, and a limit somebody only meets by hitting it reads as a bug."
+    },
+    {
+      "id": "inspector-note",
+      "x": 1120,
+      "y": 2090,
+      "w": 460,
+      "text": "The inspector is the differentiator.\n\nComparable products hide chunking. Showing the passages — with their heading path, page and approximate token count — means that when an answer is wrong later, the cause is inspectable rather than a matter of trust. Overlap is shown rather than hidden, because it looks like a bug until it is explained."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

@@ -528,3 +528,13 @@ firebase-service-account*.json
 !.vscode/extensions.json
 .DS_Store
 Thumbs.db
+
+# Seeded design canvases: ~2 MB of editor payload each, regenerated from the .dc.html sources
+# beside them. The sources are the design; this is the build output.
+design/*.html
+!design/*.dc.html
+
+# Local development settings for the API — connection string, object storage, API keys.
+# Never committed; appsettings.local.example.json documents what belongs in it.
+appsettings.local.json
+appsettings.*.local.json

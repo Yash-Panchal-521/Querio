@@ -1,0 +1,144 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+  <style>
+    :root {
+      --background: #fcfbf8; --foreground: #181a21;
+      --card: #ffffff; --muted: #f5f3f0; --muted-foreground: #5a5c64;
+      --primary: #404aaf; --primary-foreground: #f9fafd;
+      --accent: #eaecf5; --accent-foreground: #2a2d38;
+      --border: #d8d5d1; --input: #93908b;
+      --success: #206b38;
+      --citation: #12676b; --citation-subtle: #d8f5f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Geist, ui-sans-serif, system-ui, sans-serif;
+      background: var(--background);
+      color: var(--foreground);
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { color: #343d94; }
+    .mono { font-family: "Geist Mono", ui-monospace, monospace; }
+  </style>
+</helmet>
+
+<div style="display: flex; flex-direction: column; gap: 28px; width: 940px; padding: 40px 32px; background: var(--background);">
+
+  <!-- Back to the list, then identity. A detail page is somewhere you arrived from. -->
+  <div style="display: flex; flex-direction: column; gap: 14px;">
+    <a href="#" style="display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted-foreground); width: fit-content;">
+      <svg viewBox="0 0 24 24" fill="none" style="width: 14px; height: 14px;" aria-hidden="true"><path d="M14 6l-6 6 6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      Documents
+    </a>
+
+    <div style="display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 16px;">
+      <div style="display: flex; flex-direction: column; gap: 6px; min-width: 0;">
+        <h1 style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;">Employee handbook 2026.pdf</h1>
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px; font-size: 12px; font-weight: 500; color: var(--success); background: rgba(32, 107, 56, 0.09);">
+            <svg viewBox="0 0 24 24" fill="none" style="width: 13px; height: 13px;" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+            Ready
+          </span>
+          <span style="font-size: 13px; color: var(--muted-foreground);">2.4 MB · 148 passages · uploaded 12 August by Ada Lovelace</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px; flex-shrink: 0;">
+        <button style="display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--background); font-family: inherit; font-size: 13px; font-weight: 500; color: var(--foreground); cursor: pointer;">
+          <svg viewBox="0 0 24 24" fill="none" style="width: 15px; height: 15px;" aria-hidden="true"><path d="M12 4v12m0 0 4.5-4.5M12 16l-4.5-4.5M4 18v2a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          Download
+        </button>
+        <button style="display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px; background: var(--background); color: var(--muted-foreground); cursor: pointer;" aria-label="More">
+          <svg viewBox="0 0 24 24" fill="none" style="width: 16px; height: 16px;" aria-hidden="true"><circle cx="12" cy="5" r="1.6" fill="currentColor"></circle><circle cx="12" cy="12" r="1.6" fill="currentColor"></circle><circle cx="12" cy="19" r="1.6" fill="currentColor"></circle></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!--
+    This panel is the differentiator. Every comparable product treats chunking as an
+    implementation detail; showing it means that when an answer is wrong later, the cause is
+    inspectable rather than a matter of trust.
+  -->
+  <section style="display: flex; flex-direction: column; border: 1px solid var(--border); border-radius: 14px; background: var(--card); box-shadow: 0 1px 2px rgba(24, 26, 33, 0.04); overflow: hidden;">
+
+    <header style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px 14px; border-bottom: 1px solid var(--border);">
+      <div style="display: flex; flex-direction: column; gap: 2px;">
+        <h2 style="margin: 0; font-size: 14px; font-weight: 500;">Passages</h2>
+        <p style="margin: 0; font-size: 12px; color: var(--muted-foreground);">What search actually looks at. Each one is embedded separately.</p>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 10px; border: 1px solid var(--input); border-radius: 8px; background: var(--background); width: 220px;">
+          <svg viewBox="0 0 24 24" fill="none" style="width: 14px; height: 14px; color: var(--muted-foreground);" aria-hidden="true"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.7"></circle><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"></path></svg>
+          <span style="font-size: 13px; color: var(--muted-foreground);">Search in this document</span>
+        </div>
+        <span class="mono" style="font-size: 12px; color: var(--muted-foreground);">1–3 of 148</span>
+      </div>
+    </header>
+
+    <!-- Passage 1 -->
+    <article style="display: flex; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--border);">
+      <span class="mono" style="flex-shrink: 0; width: 28px; font-size: 12px; color: var(--muted-foreground); padding-top: 2px;">01</span>
+      <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+          <!-- Breadcrumb uses the citation hue, not primary: this is provenance, not a link. -->
+          <span style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; color: var(--citation); background: var(--citation-subtle);">Employee handbook › Leave › Parental</span>
+          <span class="mono" style="font-size: 11px; color: var(--muted-foreground);">page 12 · ≈124 tokens</span>
+        </div>
+        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: var(--foreground); text-wrap: pretty;">Parental leave is 26 weeks at full pay, available to either parent, and may be taken in up to three separate blocks within the first two years. Notice of at least eight weeks is expected where circumstances allow.</p>
+      </div>
+    </article>
+
+    <!-- Passage 2 -->
+    <article style="display: flex; gap: 16px; padding: 16px 20px; border-bottom: 1px solid var(--border);">
+      <span class="mono" style="flex-shrink: 0; width: 28px; font-size: 12px; color: var(--muted-foreground); padding-top: 2px;">02</span>
+      <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+          <span style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; color: var(--citation); background: var(--citation-subtle);">Employee handbook › Leave › Compassionate</span>
+          <span class="mono" style="font-size: 11px; color: var(--muted-foreground);">page 13 · ≈98 tokens</span>
+        </div>
+        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: var(--foreground); text-wrap: pretty;">Compassionate leave is granted at the manager's discretion and is not deducted from annual entitlement. There is no fixed limit; the expectation is that nobody is asked to account for time taken in the first week.</p>
+      </div>
+    </article>
+
+    <!-- Passage 3: overlap made visible, because it looks like a bug until it is explained. -->
+    <article style="display: flex; gap: 16px; padding: 16px 20px;">
+      <span class="mono" style="flex-shrink: 0; width: 28px; font-size: 12px; color: var(--muted-foreground); padding-top: 2px;">03</span>
+      <div style="display: flex; flex-direction: column; gap: 8px; min-width: 0; flex: 1;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px;">
+          <span style="display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; color: var(--citation); background: var(--citation-subtle);">Employee handbook › Benefits</span>
+          <span class="mono" style="font-size: 11px; color: var(--muted-foreground);">page 14 · ≈187 tokens</span>
+        </div>
+        <p style="margin: 0; font-size: 14px; line-height: 1.6; color: var(--foreground); text-wrap: pretty;"><span style="background: var(--muted); border-radius: 3px; padding: 1px 0;">There is no fixed limit; the expectation is that nobody is asked to account for time taken in the first week.</span> Dental cover is included for partners and dependants under 18. Optical cover is reimbursed annually up to £250 on production of a receipt.</p>
+        <p style="margin: 0; font-size: 12px; color: var(--muted-foreground);">The shaded run also appears in passage 02 — passages overlap on purpose, so a sentence spanning a boundary is whole in at least one of them.</p>
+      </div>
+    </article>
+
+  </section>
+
+  <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+    <button style="display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--background); font-family: inherit; font-size: 13px; font-weight: 500; color: var(--muted-foreground); cursor: pointer;" disabled>Previous</button>
+    <button style="display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--background); font-family: inherit; font-size: 13px; font-weight: 500; color: var(--foreground); cursor: pointer;">Next</button>
+  </div>
+
+</div>
+</x-dc>
+
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -29,5 +29,85 @@ services:
       timeout: 5s
       retries: 10
 
+  minio:
+    # S3-compatible object storage for local development. Production uses Cloudflare R2, which
+    # speaks the same API — so this exercises the same client and the same code path rather
+    # than standing in for it.
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    container_name: querio-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER:?set MINIO_ROOT_USER in .env - copy .env.example}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD in .env - copy .env.example}"
+    ports:
+      # 9000 is the S3 API, 9001 the web console.
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - querio-minio-data:/data
+
+  minio-bucket:
+    # MinIO does not create buckets on its own, and an API that starts against a missing bucket
+    # fails on the first upload rather than at start-up. This runs once and exits.
+    image: minio/mc:RELEASE.2025-08-13T08-35-41Z
+    container_name: querio-minio-bucket
+    depends_on:
+      - minio
+    environment:
+      MINIO_ROOT_USER: "${MINIO_ROOT_USER:?set MINIO_ROOT_USER in .env - copy .env.example}"
+      MINIO_ROOT_PASSWORD: "${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD in .env - copy .env.example}"
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        until mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"; do sleep 1; done
+        mc mb --ignore-existing local/querio-documents
+        echo "bucket ready"
+
+  ollama:
+    # Embeddings for development, so ingestion is not metered by anyone. The hosted provider's
+    # free allowance counts each passage as one request against a thousand a day, which a single
+    # long document spends a sixth of — untenable for a test pass that re-uploads the same file.
+    #
+    # Production does not use this. Its vectors are not comparable with the hosted provider's
+    # even at matching dimensionality, which is why every chunk records the model that produced
+    # it and retrieval filters on that.
+    image: ollama/ollama:0.12.6
+    container_name: querio-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - querio-ollama-models:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  ollama-model:
+    # Ollama does not fetch a model until something asks for it, and the first such request
+    # would be an upload — which would sit for however long a 274 MB download takes and read as
+    # a hang. Pulled up front instead. Runs once and exits, like the bucket above.
+    image: ollama/ollama:0.12.6
+    container_name: querio-ollama-model
+    depends_on:
+      ollama:
+        condition: service_started
+    environment:
+      OLLAMA_HOST: "http://ollama:11434"
+    volumes:
+      - querio-ollama-models:/root/.ollama
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        until ollama list >/dev/null 2>&1; do sleep 1; done
+        ollama pull nomic-embed-text
+        echo "embedding model ready"
+
 volumes:
   querio-postgres-data:
+  querio-minio-data:
+  querio-ollama-models:

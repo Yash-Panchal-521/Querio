@@ -12,10 +12,6 @@ internal static class AuthorizationExtensions
     {
         builder.Services.AddMemoryCache();
 
-        builder.Services.AddScoped<TenantContext>();
-        builder.Services.AddScoped<ITenantContext>(serviceProvider =>
-            serviceProvider.GetRequiredService<TenantContext>());
-
         builder.Services.AddScoped<IAuthorizationHandler, TenantAuthorizationHandler>();
 
         // Replaces the default 403 with 404 when the caller is not a member at all.

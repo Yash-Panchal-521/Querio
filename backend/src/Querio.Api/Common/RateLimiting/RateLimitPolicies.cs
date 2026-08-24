@@ -4,4 +4,5 @@ internal static class RateLimitPolicies
 {
     public const string Bootstrap = "bootstrap";
     public const string InvitationRedemption = "invitation-redemption";
+    public const string DocumentUpload = "document-upload";
 }
